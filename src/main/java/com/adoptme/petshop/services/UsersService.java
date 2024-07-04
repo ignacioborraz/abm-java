@@ -25,8 +25,12 @@ public class UsersService {
         return repository.findById(id);
     }
 
-    public void destroyOne(Long id) {
-        repository.deleteById(id);
+    public Optional<User> destroyOne(Long id) {
+        Optional<User> user = repository.findById(id);
+        if (user.isPresent()) {
+            repository.deleteById(id);
+        }
+        return user;
     }
 
 }
