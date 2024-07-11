@@ -2,105 +2,103 @@ package com.adoptme.petshop.controllers;
 
 import com.adoptme.petshop.entities.Pet;
 import com.adoptme.petshop.services.PetsService;
+import com.adoptme.petshop.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequestMapping("api/v1/pets")
 public class PetsController {
 
     @Autowired private PetsService service;
+    @Autowired private UsersService usersService;
 
     @PostMapping
-    public ResponseEntity<Pet> create(@RequestBody Pet pet) {
+    public ResponseEntity<Pet> createPet(@RequestBody Pet pet) {
         try {
-            Pet newUser = service.save(pet);
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-        } catch(Exception e) {
+            return new ResponseEntity<>(service.save(pet), HttpStatus.CREATED);
+        } catch (Exception e) {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<Pet>> readAll() {
+    public ResponseEntity<List<Pet>> getAllPets() {
         try {
-            List<Pet> users = service.readAll();
-            return ResponseEntity.ok(users);
-        } catch(Exception e) {
+            List<Pet> pets = service.findAll();
+            if (!pets.isEmpty()) {
+                return ResponseEntity.ok(pets);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (Exception e) {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pet> read(@PathVariable Long id) {
+    public ResponseEntity<Object> getPetById(@PathVariable Long id) {
         try {
-            Optional<Pet> pet = service.readOne(id);
+            Optional<Pet> pet = service.findById(id);
             if (pet.isPresent()) {
                 return ResponseEntity.ok(pet.get());
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.notFound().build();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Pet> update(@PathVariable Long id, @RequestBody Pet data) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<Pet> updatePet(@PathVariable Long id, @RequestBody Pet data) {
         try {
-            Optional<Pet> optionalPet = service.readOne(id);
+            Optional<Pet> optionalPet = service.findById(id);
             if (optionalPet.isPresent()) {
                 Pet pet = optionalPet.get();
-                if (data.getName() != null) {
-                    pet.setName(data.getName());
-                }
-                if (data.getSpecie() != null) {
-                    pet.setSpecie(data.getSpecie());
-                }
-                service.save(pet);
-                return ResponseEntity.ok(pet);
+                pet.setName(data.getName());
+                pet.setAge(data.getAge());
+                pet.setOwner(pet.getOwner());
+                return ResponseEntity.ok(service.save(pet));
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.notFound().build();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Pet> destroy(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable Long id) {
         try {
-            Optional<Pet> pet = service.destroyOne(id);
-            if (pet.isPresent()) {
-                return ResponseEntity.ok(pet.get());
+            Optional<Pet> optionalPet = service.findById(id);
+            if (optionalPet.isPresent()) {
+                service.deleteById(id);
+                return ResponseEntity.ok().build();
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.notFound().build();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @GetMapping("/{pid}/adopt/{uid}")
-    public ResponseEntity<Pet> adopt(@PathVariable Long pid, @PathVariable Long uid) {
+    @PutMapping("/{petId}/adopt/{personId}")
+    public ResponseEntity<Pet> adoptPet(@PathVariable Long petId, @PathVariable Long personId) {
         try {
-            Optional<Pet> pet = service.adopt(pid,uid);
-            if (pet.isPresent()) {
-                return ResponseEntity.ok(pet.get());
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-        } catch(Exception e) {
+            service.adoptPet(petId, personId);
+            return ResponseEntity.ok().build();
+        } catch  (Exception e) {
             System.out.println(e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

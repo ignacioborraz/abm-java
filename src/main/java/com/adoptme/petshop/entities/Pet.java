@@ -9,9 +9,11 @@ import java.util.List;
 @NoArgsConstructor @ToString @EqualsAndHashCode
 public class Pet {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Getter @Setter private Long id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter @Setter private Long id;
+
     @Getter @Setter private String name;
-    @Getter @Setter private String specie;
+    @Getter @Setter private Integer age;
 
     @ManyToOne @JoinColumn(name = "owner_id")
     @Getter @Setter private User owner;

@@ -13,40 +13,39 @@ import java.util.Optional;
 @Service
 public class PetsService {
 
-    @Autowired private PetsRepository repository;
     @Autowired private UsersRepository usersRepository;
+    @Autowired private PetsRepository petsRepository;
+
+    public List<Pet> findAll() {
+        return petsRepository.findAll();
+    }
+
+    public Optional<Pet> findById(Long id) {
+        return petsRepository.findById(id);
+    }
 
     public Pet save(Pet pet) {
-        return repository.save(pet);
+        return petsRepository.save(pet);
     }
 
-    public List<Pet> readAll() {
-        return repository.findAll();
+    public void deleteById(Long id) {
+        petsRepository.deleteById(id);
     }
 
-    public Optional<Pet> readOne(Long id) {
-        return repository.findById(id);
-    }
-
-    public Optional<Pet> destroyOne(Long id) {
-        Optional<Pet> pet = repository.findById(id);
-        if (pet.isPresent()) {
-            repository.deleteById(id);
+    public Pet adoptPet(Long petId, Long userId) throws Exception {
+        Optional<Pet> pet = petsRepository.findById(petId);
+        if (!pet.isPresent()) {
+            throw new Exception("Pet not found with id: " + petId);
         }
-        return pet;
-    }
-
-    public Optional<Pet> adopt(Long petId, Long userId) {
-        Optional<Pet> pet = repository.findById(petId);
         Optional<User> user = usersRepository.findById(userId);
-        if (pet.isEmpty() || user.isEmpty()) {
-            return pet;
+        if (!user.isPresent()) {
+            throw new Exception("User not found with id: " + petId);
         }
         Pet foundPet = pet.get();
         User foundUser = user.get();
         foundPet.setOwner(foundUser);
-        repository.save(foundPet);
-        return pet;
+        petsRepository.save(foundPet);
+        return foundPet;
     }
 
 }
