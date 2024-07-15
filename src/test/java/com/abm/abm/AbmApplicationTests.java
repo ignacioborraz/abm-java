@@ -1,10 +1,10 @@
-package com.adoptme.petshop;
+package com.abm.abm;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PetshopApplicationTests {
+class AbmApplicationTests {
 
 	@Test
 	void contextLoads() {
