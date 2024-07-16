@@ -20,18 +20,41 @@ public class ProductService {
     }
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            throw new RuntimeException("Products not found");
+        } else {
+            return products;
+        }
     }
 
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public Product getProductById(Long id) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            return product.get();
+        } else {
+            throw new RuntimeException("Product not found");
+        }
+        
     }
 
     public Product updateProduct(Long id, Product productDetails) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
-        product.setTitle(productDetails.getTitle());
-        product.setStock(productDetails.getStock());
-        product.setPrice(productDetails.getPrice());
-        return productRepository.save(product);
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            Product foundProduct = product.get();
+            if (productDetails.getTitle() != null) {
+                foundProduct.setTitle(productDetails.getTitle());
+            }
+            if (productDetails.getStock() != null) {
+                foundProduct.setStock(productDetails.getStock());
+            }
+            if (productDetails.getPrice() != null) {
+                foundProduct.setPrice(productDetails.getPrice());
+            }
+            return productRepository.save(foundProduct);
+        } else {
+            throw new RuntimeException("Product not found");
+        }
+
     }
 }

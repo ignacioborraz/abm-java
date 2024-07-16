@@ -1,6 +1,8 @@
 package com.abm.abm.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,8 +24,9 @@ public class Invoice {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
-    @JsonBackReference
+    @JsonIgnore
     private Client client;
 
     private Double total;
+    private Date createdAt;
 }

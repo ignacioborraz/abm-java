@@ -2,8 +2,6 @@ package com.abm.abm.entities;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,10 +23,18 @@ public class Client {
     private Integer docnumber;
 
     @OneToMany(mappedBy = "client")
-    @JsonBackReference
     private List<Cart> carts;
 
     @OneToMany(mappedBy = "client")
-    @JsonBackReference
     private List<Invoice> invoices;
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", docnumber='" + docnumber + '\'' +
+                '}';
+    }
+
 }

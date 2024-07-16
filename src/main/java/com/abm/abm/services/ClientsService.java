@@ -1,5 +1,7 @@
 package com.abm.abm.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +19,18 @@ public class ClientsService {
     }
 
     public Client updateClient(Long id, Client clientDetails) {
-        Client client = clientRepository.findById(id).orElseThrow(() -> new RuntimeException("Client not found"));
-        client.setName(clientDetails.getName());
-        client.setDocnumber(clientDetails.getDocnumber());
-        return clientRepository.save(client);
+        Optional<Client> client = clientRepository.findById(id);
+        if (client.isPresent()) {
+            Client foundClient = client.get();
+            if (clientDetails.getName() != null) {
+                foundClient.setName(clientDetails.getName());
+            }
+            if (clientDetails.getDocnumber() != null) {
+                foundClient.setDocnumber(clientDetails.getDocnumber());
+            }
+            return clientRepository.save(foundClient);
+        } else {
+            throw new RuntimeException("Client not found");
+        }
     }
 }

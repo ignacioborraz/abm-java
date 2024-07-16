@@ -1,5 +1,8 @@
 package com.abm.abm.services;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,19 +25,38 @@ public class CartsService {
     @Autowired
     private ClientsRepository clientRepository;
 
-    public Cart addProductToCart(Long clientId, Long productId, int quantity) {
-        Client client = clientRepository.findById(clientId).orElseThrow(() -> new RuntimeException("Client not found"));
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found"));
-
-        Cart cart = new Cart();
-        cart.setClient(client);
-        cart.setProduct(product);
-        cart.setQuantity(quantity);
-
-        return cartRepository.save(cart);
+    public Cart addProductToCart(Long clientId, Long productId, Integer amount) {
+        Optional<Client> client = clientRepository.findById(clientId);
+        Optional<Product> product = productRepository.findById(productId);
+        if (client.isPresent() & product.isPresent()) {
+            Cart cart = new Cart();
+            cart.setClient(client.get());
+            cart.setProduct(product.get());
+            cart.setPrice(product.get().getPrice());
+            cart.setAmount(amount);
+            cart.setDelivered(false);
+            return cartRepository.save(cart);
+        } else {
+            throw new RuntimeException("Client or Product not found");
+        }
     }
 
-    public void removeProductFromCart(Long cartId) {
-        cartRepository.deleteById(cartId);
+    public Cart removeProductFromCart(Long cartId) {
+        Optional<Cart> cart = cartRepository.findById(cartId);
+        if (cart.isPresent()) {
+            cartRepository.deleteById(cartId);
+            return cart.get();
+        } else {
+            throw new RuntimeException("Cart not found");
+        }
+    }
+
+    public List<Cart> findByClientIdAndDelivered(Long clientId) {
+        List<Cart> carts = cartRepository.findByClientIdAndDelivered(clientId, false);
+        if (carts.isEmpty()) {
+            throw new RuntimeException("Carts not found");
+        } else {
+            return carts;
+        }
     }
 }
