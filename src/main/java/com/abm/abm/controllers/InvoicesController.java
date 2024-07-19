@@ -1,7 +1,5 @@
 package com.abm.abm.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +34,7 @@ public class InvoicesController {
     public ResponseEntity<Invoice> generateInvoice(@RequestParam Long clientId) {
         try {
             Invoice invoice = invoiceService.generateInvoice(clientId);
-            return ResponseEntity.ok(invoice);
+            return ResponseEntity.status(HttpStatus.CREATED).body(invoice);
         } catch (RuntimeException e) {
             // System.out.println(e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -52,10 +50,10 @@ public class InvoicesController {
     @ApiResponse(responseCode = "404", description = "Client not found")
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @GetMapping("/{clientId}")
-    public ResponseEntity<List<Invoice>> getInvoicesByClientId(@PathVariable Long clientId) {
+    public ResponseEntity<Invoice> getInvoicesByClientId(@PathVariable Long clientId) {
         try {
-            List<Invoice> invoices = invoiceService.getInvoicesByClientId(clientId);
-            return ResponseEntity.ok(invoices);
+            Invoice invoice = invoiceService.getInvoicesByClientId(clientId);
+            return ResponseEntity.ok(invoice);
         } catch (RuntimeException e) {
             // System.out.println(e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

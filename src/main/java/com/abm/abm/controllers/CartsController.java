@@ -28,7 +28,7 @@ public class CartsController {
     private CartsService cartService;
 
     @Operation(summary = "Add product to cart", description = "Adds a product to the client's cart with the specified quantity")
-    @ApiResponse(responseCode = "200", description = "Product added to cart successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Cart.class)))
+    @ApiResponse(responseCode = "201", description = "Product added to cart successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Cart.class)))
     @ApiResponse(responseCode = "400", description = "Bad request")
     @ApiResponse(responseCode = "404", description = "Client or Product not found")
     @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -36,7 +36,7 @@ public class CartsController {
     public ResponseEntity<Cart> addProductToCart(@PathVariable Long clid, @PathVariable Long pid, @PathVariable Integer quantity) {
         try {
             Cart cart = cartService.addProductToCart(clid, pid, quantity);
-            return ResponseEntity.ok(cart);
+            return ResponseEntity.status(HttpStatus.CREATED).body(cart);
         }catch (RuntimeException e) {
             // System.out.println(e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -51,6 +51,7 @@ public class CartsController {
     @ApiResponse(responseCode = "204", description = "Product removed from cart successfully")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @ApiResponse(responseCode = "404", description = "Cart not found")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
     @DeleteMapping("/{cartId}")
     public ResponseEntity<Void> removeProductFromCart(@PathVariable Long cartId) {
         try {

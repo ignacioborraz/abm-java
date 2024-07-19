@@ -50,10 +50,15 @@ public class InvoicesService {
         }
     }
 
-    public List<Invoice> getInvoicesByClientId(Long clientId) {
+    public Invoice getInvoicesByClientId(Long clientId) {
         Optional<Client> client = clientRepository.findById(clientId);
         if (client.isPresent()) {
-            return client.get().getInvoices();
+            List<Invoice> invoices = client.get().getInvoices();
+            if (invoices.isEmpty()) {
+                throw new RuntimeException("No invoices found for the client");
+            }
+            Invoice lastInvoice = invoices.get(invoices.size() - 1);
+            return lastInvoice;
         } else {
             throw new RuntimeException("Client not found");
         }
